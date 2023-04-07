@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chart_marker_bg"
+        android:padding="2dp">
+
+        <TextView
+            android:id="@+id/chart_marker_content_x"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:includeFontPadding="true"
+            android:paddingHorizontal="2dp"
+            android:textColor="@color/chart_marker_bg_color"
+            android:textSize="6sp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="11/12/2021" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="11dp"
+            android:background="@drawable/chart_marker_text_bg"
+            android:layout_gravity="center"
+            app:layout_constraintWidth_min="wrap"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:id="@+id/chart_marker_content_y"
+                android:layout_width="wrap_content"
+                android:layout_height="9dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:gravity="center"
+                android:fontFamily="@font/rubik_bold"
+                android:includeFontPadding="false"
+                android:textColor="@color/white"
+                android:textSize="8sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="119.8"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</layout>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="reservedValue"
+            type="org.dhis2.usescases.reservedValue.ReservedValueModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/displayName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{reservedValue.attributeName}"
+            android:textColor="@color/textPrimary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@id/refill"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Display Name" />
+
+        <TextView
+            android:id="@+id/orgUnit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textPrimary"
+            android:textSize="12sp"
+            android:visibility="@{reservedValue.hasOrgUnit() ? View.VISIBLE : View.GONE}"
+            app:layout_constraintEnd_toStartOf="@id/refill"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/displayName"
+            tools:text="Org Unit" />
+
+        <TextView
+            android:id="@+id/reservedValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{reservedValue.valuesLeft()}"
+            android:textColor="@color/textSecondary"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/refill"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orgUnit"
+            tools:text="100 reserved values left" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/refill"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{()->reservedValue.refill()}"
+            android:text="@string/refill_reserved_values"
+            android:textColor="?colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:networkVisibility="@{true}" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -1,0 +1,3 @@
+This is a hotfix version that fixes:
+-  [ANDROAPP-5194](https://jira.dhis2.org/browse/ANDROAPP-5194) RuntimeException: Unable to start activity ComponentInfo{com.dhis2/org.dhis2.usescases.eventsWithoutRegistration.ev...
+You can find all the details on Jira and Github.

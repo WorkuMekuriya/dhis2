@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+        <import type="android.graphics.drawable.Drawable" />
+
+        <variable
+            name="viewModel"
+            type="org.dhis2.usescases.datasets.datasetDetail.datasetList.DataSetListViewModel" />
+
+        <variable
+            name="dataset"
+            type="org.dhis2.usescases.datasets.datasetDetail.DataSetDetailModel" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="0dp"
+        app:rippleColor="@color/rippleColor"
+        android:onClick="@{() -> viewModel.openDataSet(dataset)}"
+        tools:style="@style/CardView">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minHeight="60dp">
+
+            <ImageView
+                android:id="@+id/dataSetStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="19dp"
+                android:layout_marginTop="18dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:dataSetStatus='@{dataset.isComplete()}'
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/dataSetPeriod"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="35dp"
+                android:gravity="bottom"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                android:text='@{dataset.namePeriod()}'
+                app:layout_constraintEnd_toStartOf="@+id/sync_icon"
+                app:layout_constraintStart_toEndOf="@id/dataSetStatus"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Nov. 2020" />
+
+            <TextView
+                android:id="@+id/orgUnit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:text='@{dataset.nameOrgUnit}'
+                android:visibility="@{dataset.displayOrgUnitName() ? View.VISIBLE : View.GONE}"
+                app:layout_constraintEnd_toStartOf="@id/sync_icon"
+                app:layout_constraintStart_toStartOf="@id/dataSetPeriod"
+                app:layout_constraintTop_toBottomOf="@id/dataSetPeriod"
+                tools:text="Ngelehun CHC" />
+
+            <TextView
+                android:id="@+id/optionCombo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="13dp"
+                android:textColor="@color/textSecondary"
+                android:text='@{dataset.nameCatCombo}'
+                android:textSize="12sp"
+                android:visibility='@{dataset.nameCatCombo().equals("default") ? View.GONE : View.VISIBLE}'
+                app:layout_constraintEnd_toStartOf="@id/sync_icon"
+                app:layout_constraintStart_toStartOf="@id/dataSetPeriod"
+                app:layout_constraintTop_toBottomOf="@id/orgUnit"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="APHIAplus, Improve access to clean water" />
+
+            <ImageView
+                android:id="@+id/sync_icon"
+                style="@style/ActionIconSmallPadding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="14dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:stateIcon='@{dataset.state}'
+                android:onClick="@{() -> viewModel.syncDataSet(dataset)}"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_sync" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="@color/divider_bg"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/dataSetPeriod" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>
