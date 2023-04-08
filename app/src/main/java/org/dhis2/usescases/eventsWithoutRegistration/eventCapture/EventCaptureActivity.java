@@ -248,8 +248,7 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
         // TODO: sqlite method
 
         Middleware dbHelper = new Middleware(this);
-        List<Data> userList = dbHelper.fetchData(eventUid);
-
+        List<Data> dataList = dbHelper.fetchData(eventUid);
 
         setAction(ActionType.FINISH);
         // TODO: middleware method

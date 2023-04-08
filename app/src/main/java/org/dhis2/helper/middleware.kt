@@ -13,8 +13,8 @@ class Middleware(context: Context) :
 
     companion object {
         private const val DATABASE_NAME =
-            "dhis-immunization-k8s-sandboxaddis-com_Test_unencrypted_db"
-        private const val DATABASE_VERSION = 1
+            "dhis-immunization-k8s-sandboxaddis-com_Test_unencrypted.db"
+        private const val DATABASE_VERSION = 135
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -25,19 +25,25 @@ class Middleware(context: Context) :
 
     @SuppressLint("Range")
     fun fetchData(eventUID: String): List<Data> {
-        val userList = mutableListOf<Data>()
+        val dataList = mutableListOf<Data>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-//            "SELECT d.formName, tedv.value FROM DataElement d JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid WHERE tedv.event = $eventUID AND d.uid IN (SELECT dataElement FROM ProgramStageDataElement WHERE programStage IN (SELECT programStage FROM Event WHERE uid = $eventUID));",
-            "SELECT * FROM Event WHERE uid = $eventUID", null
+            "SELECT d.formName as formName, tedv.value as value " +
+                    "FROM DataElement d " +
+                    "JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid " +
+                    "WHERE tedv.event = '$eventUID' AND d.uid " +
+                    "IN (SELECT dataElement FROM ProgramStageDataElement " +
+                    "WHERE programStage " +
+                    "IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
+            null
         )
         try {
             if (cursor.moveToFirst()) {
                 do {
                     val formName = cursor.getString(cursor.getColumnIndex("formName"))
                     val value = cursor.getString(cursor.getColumnIndex("value"))
-                    val user = Data(formName, value)
-                    userList.add(user)
+                    val data = Data(formName, value)
+                    dataList.add(data)
                 } while (cursor.moveToNext())
             }
         } catch (e: SQLiteException) {
