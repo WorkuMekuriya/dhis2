@@ -52,7 +52,7 @@ class Middleware(context: Context) :
         } finally {
             cursor.close()
         }
-        return userList
+        return dataList
     }
 
     fun convertEventToJson(event: JSONObject): JSONObject {
