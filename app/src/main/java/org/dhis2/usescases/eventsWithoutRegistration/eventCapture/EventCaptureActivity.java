@@ -6,7 +6,6 @@ import static org.dhis2.utils.analytics.AnalyticsConstants.DELETE_EVENT;
 import static org.dhis2.utils.analytics.AnalyticsConstants.SHOW_HELP;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -27,16 +26,15 @@ import org.dhis2.Bindings.ExtensionsKt;
 import org.dhis2.Bindings.ViewExtensionsKt;
 import org.dhis2.R;
 import org.dhis2.commons.Constants;
-import org.dhis2.commons.sync.ConflictType;
 import org.dhis2.commons.dialogs.AlertBottomDialog;
 import org.dhis2.commons.dialogs.CustomDialog;
 import org.dhis2.commons.dialogs.DialogClickListener;
 import org.dhis2.commons.dialogs.bottomsheet.BottomSheetDialog;
-import org.dhis2.commons.popupmenu.AppMenuHelper;
-import org.dhis2.databinding.ActivityEventCaptureBinding;
 import org.dhis2.commons.dialogs.bottomsheet.BottomSheetDialogUiModel;
 import org.dhis2.commons.dialogs.bottomsheet.DialogButtonStyle;
-import org.dhis2.helper.Data;
+import org.dhis2.commons.popupmenu.AppMenuHelper;
+import org.dhis2.commons.sync.ConflictType;
+import org.dhis2.databinding.ActivityEventCaptureBinding;
 import org.dhis2.helper.Middleware;
 import org.dhis2.ui.ThemeManager;
 import org.dhis2.usescases.eventsWithoutRegistration.eventCapture.eventCaptureFragment.OnEditionListener;
@@ -55,7 +53,6 @@ import org.dhis2.utils.granularsync.SyncStatusDialog;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -245,14 +242,19 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
     @Override
     public void SaveAndFinish() {
         displayMessage(getString(R.string.saved));
-        // TODO: sqlite method
+        // TODO: change the type dynamically
+        String type = "Routine";
 
-        Middleware dbHelper = new Middleware(this);
-        List<Data> dataList = dbHelper.fetchData(eventUid);
+        Middleware dbHelper = new Middleware(this, type);
+        String dataList = dbHelper.fetchData(eventUid);
 
         setAction(ActionType.FINISH);
-        // TODO: middleware method
 
+        Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+        launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity");
+        launchIntent.putExtra("Type", type);
+        launchIntent.putExtra("json", dataList);
+        startActivity(launchIntent);
     }
 
     @Override
