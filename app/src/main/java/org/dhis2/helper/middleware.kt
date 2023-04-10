@@ -6,9 +6,10 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import org.json.JSONObject
+import com.google.gson.GsonBuilder
+import java.util.*
 
-class Middleware(context: Context) :
+class Middleware(context: Context, val type: String) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
@@ -24,17 +25,11 @@ class Middleware(context: Context) :
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
     @SuppressLint("Range")
-    fun fetchData(eventUID: String): List<Data> {
+    fun fetchData(eventUID: String): String? {
         val dataList = mutableListOf<Data>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT d.formName as formName, tedv.value as value " +
-                    "FROM DataElement d " +
-                    "JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid " +
-                    "WHERE tedv.event = '$eventUID' AND d.uid " +
-                    "IN (SELECT dataElement FROM ProgramStageDataElement " +
-                    "WHERE programStage " +
-                    "IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
+            "SELECT d.formName as formName, tedv.value as value " + "FROM DataElement d " + "JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid " + "WHERE tedv.event = '$eventUID' AND d.uid " + "IN (SELECT dataElement FROM ProgramStageDataElement " + "WHERE programStage " + "IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
             null
         )
         try {
@@ -52,26 +47,34 @@ class Middleware(context: Context) :
         } finally {
             cursor.close()
         }
-        return dataList
+        val arrayJson = convertArrayToArrayJSON(dataList, type)
+        return mapEventToJsonString(arrayJson, type)
     }
 
-    fun convertEventToJson(event: JSONObject): JSONObject {
-        val json = JSONObject()
-//        try {
-//            json.put("eventName", event.name)
-//        } catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-        return json
+    private fun mapEventToJsonString(
+        event: Map<String, Any>, typeOfVaccine: String
+    ): String? {
+        return when (typeOfVaccine) {
+            "Routine" -> {
+                val vaccinationMap = mapOf(
+                    "nextAppointment" to event["Next Appointment"],
+                    "dateGiven" to event["DateGiven"]!!
+                    //TODO: add other fields
+                )
+                val routineList = listOf(vaccinationMap)
+                val routineMap = mapOf(type.lowercase(Locale.getDefault()) to routineList)
+                GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
+            }
+            else -> ""
+        }
     }
 
-    fun convertAnotherEventToJson(event: JSONObject): JSONObject {
-        val json = JSONObject()
-//        try {
-//            json.put("eventName", event.name)
-//        } catch (e: JSONException) {
-//            e.printStackTrace()
-//        }
-        return json
+    private fun convertArrayToArrayJSON(
+        data: MutableList<Data>, typeOfVaccine: String
+    ): Map<String, Any> {
+        return when (typeOfVaccine) {
+            "Routine" -> data.associate { it.formName.toString() to it.value }
+            else -> emptyMap()
+        }
     }
 }
