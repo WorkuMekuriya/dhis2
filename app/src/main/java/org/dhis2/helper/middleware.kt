@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import androidx.compose.ui.text.toLowerCase
 import com.google.gson.GsonBuilder
 import java.util.*
 
@@ -58,11 +59,11 @@ class Middleware(context: Context, val type: String) :
             "Routine" -> {
                 val vaccinationMap = mapOf(
                     "nextAppointment" to event["Next Appointment"],
-                    "dateGiven" to event["DateGiven"]!!
+                    "dateGiven" to event["DateGiven"]
                     //TODO: add other fields
                 )
                 val routineList = listOf(vaccinationMap)
-                val routineMap = mapOf(type.lowercase(Locale.getDefault()) to routineList)
+                val routineMap = mapOf(type.toLowerCase() to routineList)
                 GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
             }
             else -> ""
@@ -73,7 +74,7 @@ class Middleware(context: Context, val type: String) :
         data: MutableList<Data>, typeOfVaccine: String
     ): Map<String, Any> {
         return when (typeOfVaccine) {
-            "Routine" -> data.associate { it.formName.toString() to it.value }
+            "Routine" -> data.associate { it.formName to it.value }
             else -> emptyMap()
         }
     }
