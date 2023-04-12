@@ -30,15 +30,16 @@ class Middleware(context: Context, val type: String) :
         val dataList = mutableListOf<Data>()
         val db = readableDatabase
         val cursor = db.rawQuery(
-            "SELECT d.formName as formName, tedv.value as value " + "FROM DataElement d " + "JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid " + "WHERE tedv.event = '$eventUID' AND d.uid " + "IN (SELECT dataElement FROM ProgramStageDataElement " + "WHERE programStage " + "IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
+            "SELECT d.formName as formName,d.shortName as name, tedv.value as value " + "FROM DataElement d " + "JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid " + "WHERE tedv.event = '$eventUID' AND d.uid " + "IN (SELECT dataElement FROM ProgramStageDataElement " + "WHERE programStage " + "IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
             null
         )
         try {
             if (cursor.moveToFirst()) {
                 do {
+                    val Name = cursor.getString(cursor.getColumnIndex("name"))
                     val formName = cursor.getString(cursor.getColumnIndex("formName"))
                     val value = cursor.getString(cursor.getColumnIndex("value"))
-                    val data = Data(formName, value)
+                    val data = Data(Name,formName, value)
                     dataList.add(data)
                 } while (cursor.moveToNext())
             }
@@ -59,7 +60,8 @@ class Middleware(context: Context, val type: String) :
             "Routine" -> {
                 val vaccinationMap = mapOf(
                     "nextAppointment" to event["Next Appointment"],
-                    "dateGiven" to event["DateGiven"]
+                    "dateGiven" to event["DateGiven"],
+                    "typeOfVaccination" to typeOfVaccine,
                     //TODO: add other fields
                 )
                 val routineList = listOf(vaccinationMap)

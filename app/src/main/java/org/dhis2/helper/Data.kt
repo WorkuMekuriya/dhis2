@@ -1,6 +1,7 @@
 package org.dhis2.helper
 
 class Data(
+    var Name: String,
     var formName: String,
     var value: String
 ) {
