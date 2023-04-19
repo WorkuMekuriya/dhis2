@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
@@ -12,8 +13,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.File
-import javax.inject.Inject
 import org.dhis2.App
 import org.dhis2.R
 import org.dhis2.commons.Constants
@@ -30,6 +29,7 @@ import org.dhis2.form.data.GeometryParserImpl
 import org.dhis2.form.model.EnrollmentRecords
 import org.dhis2.form.ui.FormView
 import org.dhis2.form.ui.provider.EnrollmentResultDialogUiProvider
+import org.dhis2.helper.Middleware
 import org.dhis2.maps.views.MapSelectorActivity
 import org.dhis2.usescases.events.ScheduledEventActivity
 import org.dhis2.usescases.eventsWithoutRegistration.eventCapture.EventCaptureActivity
@@ -39,6 +39,9 @@ import org.dhis2.usescases.teiDashboard.TeiDashboardMobileActivity
 import org.dhis2.utils.EventMode
 import org.hisp.dhis.android.core.common.FeatureType
 import org.hisp.dhis.android.core.enrollment.EnrollmentStatus
+import java.io.File
+import javax.inject.Inject
+
 
 class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
 
@@ -145,6 +148,18 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
 
         binding.save.setOnClickListener {
             performSaveClick()
+
+            // TODO: DemographicRoutine
+            val type = "DemographicRoutine"
+
+            val dbHelper = Middleware(this, type)
+            val dataList = dbHelper.fetchData(enrollmentUid, type)
+
+            val launchIntent = Intent(Intent.ACTION_MAIN)
+            launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
+            launchIntent.putExtra("Type", type)
+            launchIntent.putExtra("json", dataList)
+            startActivity(launchIntent)
         }
 
         presenter.init()

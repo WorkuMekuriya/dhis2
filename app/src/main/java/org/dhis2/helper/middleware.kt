@@ -56,15 +56,16 @@ class Middleware(context: Context, val type: String) :
 
             "DemographicRoutine" -> {
                 val cursor = db.rawQuery(
-                    "SELECT TrackedEntityAttributeValue.value as value, TrackedEntityAttribute.formName as formName FROM TrackedEntityAttributeValue INNER JOIN TrackedEntityAttribute ON TrackedEntityAttributeValue.trackedEntityAttribute = TrackedEntityAttribute.uid WHERE TrackedEntityAttributeValue.trackedEntityInstance = $eventUID;",
-                    null
+                        "SELECT TrackedEntityAttributeValue.value as value, TrackedEntityAttribute.formName as formName, OrganisationUnit.name as name FROM TrackedEntityAttributeValue INNER JOIN TrackedEntityAttribute ON TrackedEntityAttributeValue.trackedEntityAttribute = TrackedEntityAttribute.uid INNER JOIN Enrollment ON TrackedEntityAttributeValue.trackedEntityInstance = Enrollment.trackedEntityInstance INNER JOIN OrganisationUnit ON Enrollment.organisationUnit = OrganisationUnit.uid WHERE Enrollment.uid = '$eventUID'",
+                        null
                 )
                 try {
                     if (cursor.moveToFirst()) {
                         do {
                             val formName = cursor.getString(cursor.getColumnIndex("formName"))
                             val value = cursor.getString(cursor.getColumnIndex("value"))
-                            val data = Data("", formName, value)
+                            val name = cursor.getString(cursor.getColumnIndex("name"))
+                            val data = Data(name, formName, value)
                             dataList.add(data)
                         } while (cursor.moveToNext())
                     }
@@ -100,25 +101,25 @@ class Middleware(context: Context, val type: String) :
 
             "DemographicRoutine" -> {
                 val vaccinationMap = mapOf(
-                    "serialNumber" to event["Serial Number"],
-//                    "cardNo" to event["Next Appointment"],
-                    "nameOfInfant" to event["First Name"],
-                    "nameOfMother" to event["Mother's Name"],
-                    "nameOfBabysFather" to event["Middle name"],
-                    "sex" to event["Sex"],
-                    "dateOfBirth" to event["Date of Birth"],
-//                    "dateOfBirthOfMother" to event["Next Appointment"],
-                    "birthWeight/birthHeight" to event["Next Appointment"],
-//                    "parentPhoneNo" to event["Next Appointment"],
-                    "address" to mapOf(
-                        "region" to event["Region"],
-                        "zone" to event["Zone"],
-                        "woreda" to event["Woreda"],
-                        "kebele" to event["Kebele"],
-//                        "ketena/got" to event["Next Appointment"],
-//                        "houseNumber" to event["Next Appointment"],
-                    ),
-//                    "healthFacility" to event["Next Appointment"]
+                        "serialNumber" to event["Serial Number"],
+                        "cardNo" to event["Unique System Identifier (EPI)"],
+                        "nameOfInfant" to event["First Name"],
+                        "nameOfMother" to event["Mother's Name"],
+                        "nameOfBabysFather" to event["Middle name"],
+                        "sex" to event["Sex"],
+                        "dateOfBirth" to event["Date of Birth"],
+                        "dateOfBirthOfMother" to "-",
+                        "birthWeight/birthHeight" to event["Next Appointment"],
+                        "parentPhoneNo" to event["Caregiver's contact number"],
+                        "address" to mapOf(
+                                "region" to event["Region"],
+                                "zone" to event["Zone"],
+                                "woreda" to event["Woreda"],
+                                "kebele" to event["Kebele"],
+                                "ketena/got" to "-",
+                                "houseNumber" to event["House Number"],
+                        ),
+                        "healthFacility" to "Ministry of Health"
                 )
                 val demographicRoutineList = listOf(vaccinationMap)
                 val demographicRoutineMap = mapOf(type.toLowerCase() to demographicRoutineList)

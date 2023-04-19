@@ -202,13 +202,14 @@ class SearchTEList : FragmentGlobalAbstract() {
                     }
                     setMargins(0, 0, 0, bottomMargin)
                 }
-                if (createButtonVisibility && !filtersOpened) {
+                //TODO: Open with out filters
+//                if (createButtonVisibility && !filtersOpened) {
                     CreateNewButton(
                         modifier = Modifier,
                         extended = !isScrollingDown,
                         onClick = viewModel::onEnrollClick
                     )
-                }
+//                }
             }
         }
     }

@@ -246,7 +246,7 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
         String type = "Routine";
 
         Middleware dbHelper = new Middleware(this, type);
-        String dataList = dbHelper.fetchData(eventUid);
+        String dataList = dbHelper.fetchData(eventUid, type);
 
         setAction(ActionType.FINISH);
 
