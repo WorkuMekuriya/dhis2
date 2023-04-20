@@ -243,7 +243,7 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
     public void SaveAndFinish() {
         displayMessage(getString(R.string.saved));
         // TODO: change the type dynamically
-        String type = "Routine";
+        String type = "Immunization";
 
         Middleware dbHelper = new Middleware(this, type);
         String dataList = dbHelper.fetchData(eventUid, type);

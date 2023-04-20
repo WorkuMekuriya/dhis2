@@ -149,17 +149,7 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
         binding.save.setOnClickListener {
             performSaveClick()
 
-            // TODO: DemographicRoutine
-            val type = "DemographicRoutine"
 
-            val dbHelper = Middleware(this, type)
-            val dataList = dbHelper.fetchData(enrollmentUid, type)
-
-            val launchIntent = Intent(Intent.ACTION_MAIN)
-            launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
-            launchIntent.putExtra("Type", type)
-            launchIntent.putExtra("json", dataList)
-            startActivity(launchIntent)
         }
 
         presenter.init()
@@ -397,6 +387,17 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
     }
 
     override fun performSaveClick() {
+        val enrollmentUid = intent.getStringExtra(ENROLLMENT_UID_EXTRA) ?: ""
+        val type = "Demographic"
+
+        val dbHelper = Middleware(this, type)
+        val dataList = dbHelper.fetchData(enrollmentUid, type)
+
+        val launchIntent = Intent(Intent.ACTION_MAIN)
+        launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
+        launchIntent.putExtra("Type", type)
+        launchIntent.putExtra("json", dataList)
+        startActivity(launchIntent)
         formView.onSaveClick()
     }
 
