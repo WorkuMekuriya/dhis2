@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import com.google.gson.GsonBuilder
 import timber.log.Timber
 import java.util.*
@@ -155,33 +154,33 @@ class Middleware(context: Context, val type: String) :
                 return when (type) {
                     "Covax" -> {
                         val vaccinationMap = mapOf(
-                            "underlyingCondition" to event["name"],
-                            "chronicHeartDisease" to event["name"],
-                            "hypertension" to event["name"],
-                            "diabetes" to event["name"],
-                            "cancer" to event["name"],
-                            "HepaticFailure" to event["name"],
-                            "pulmonaryDiseases" to event["name"],
-                            "renalFailure" to event["name"],
-                            "autoimmuneDiseases" to event["name"],
-                            "morbidObesity" to event["name"],
-                            "HIV_AIDS" to event["name"],
-                            "mentalIllness" to event["name"],
-                            "underlyingConditionOther" to event["name"],
-                            "nameOfVaccinationPost_HF_IDP_RefugeeCamp" to event["name"],
+                            "underlyingCondition" to false,
+                            "chronicHeartDisease" to false,
+                            "hypertension" to false,
+                            "diabetes" to false,
+                            "cancer" to false,
+                            "HepaticFailure" to false,
+                            "pulmonaryDiseases" to false,
+                            "renalFailure" to false,
+                            "autoimmuneDiseases" to false,
+                            "morbidObesity" to false,
+                            "HIV_AIDS" to false,
+                            "mentalIllness" to false,
+                            "underlyingConditionOther" to false,
+                            "nameOfVaccinationPost_HF_IDP_RefugeeCamp" to "-",
                             "routine" to mapOf(
-                                "vaccineName" to event["name"],
-                                "batchNumber" to event["name"],
-                                "batchNumber2" to event["name"],
-                                "batchNumber3" to event["name"],
-                                "doseNumber" to event["name"],
-                                "totalDoses" to event["name"],
-                                "suggestedDateForNextDose" to event["name"],
-                                "vaccineDate1" to event["name"],
-                                "vaccineDate2" to event["name"],
-                                "vaccineDate3" to event["name"],
-                                "allergicReactionAfterFirstDose" to event["name"],
-                                "AEFIsPresent" to event["name"]
+                                "vaccineName" to "-",
+                                "batchNumber" to event["COVAC- Batch Number"],
+                                "batchNumber2" to "-",
+                                "batchNumber3" to "-",
+                                "doseNumber" to event["COVAC - Dose Number"],
+                                "totalDoses" to event["COVAC - Total doses"],
+                                "suggestedDateForNextDose" to event["COVAC Suggested date for next dose"],
+                                "vaccineDate1" to "-",
+                                "vaccineDate2" to "-",
+                                "vaccineDate3" to "-",
+                                "allergicReactionAfterFirstDose" to false,
+                                "AEFIsPresent" to false
                             ),
                         )
                         val routineList = listOf(vaccinationMap)
