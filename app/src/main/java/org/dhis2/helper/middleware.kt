@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.google.gson.GsonBuilder
+import timber.log.Timber
 import java.util.*
 
 class Middleware(context: Context, val type: String) :
@@ -57,7 +58,7 @@ class Middleware(context: Context, val type: String) :
                         } while (cursor.moveToNext())
                     }
                 } catch (e: SQLiteException) {
-                    Log.e("DatabaseHelper", "getAllUsers: ${e.message}")
+                    Timber.e("getAllUsers: " + e.message)
                     // handle the exception here, e.g. by showing an error dialog to the user
                 } finally {
                     cursor.close()
@@ -87,7 +88,7 @@ class Middleware(context: Context, val type: String) :
                         } while (cursor.moveToNext())
                     }
                 } catch (e: SQLiteException) {
-                    Log.e("DatabaseHelper", "getAllUsers: ${e.message}")
+                    Timber.tag("DatabaseHelper").e("getAllUsers: %s", e.message)
                     // handle the exception here, e.g. by showing an error dialog to the user
                 } finally {
                     cursor.close()
@@ -120,25 +121,26 @@ class Middleware(context: Context, val type: String) :
                     }
                     "Demographic" -> {
                         val vaccinationMap = mapOf(
-                            "serialNumber" to event["Serial Number"],
-                            "cardNo" to event["Unique System Identifier (EPI)"],
-                            "nameOfInfant" to event["First Name"],
-                            "nameOfMother" to event["Mother's Name"],
-                            "nameOfBabysFather" to event["Middle name"],
-                            "sex" to event["Sex"],
-                            "dateOfBirth" to event["Date of Birth"],
-                            "dateOfBirthOfMother" to "-",
-                            "birthWeight/birthHeight" to event["Next Appointment"],
-                            "parentPhoneNo" to event["Caregiver's contact number"],
+                            "idNumber" to event["Serial Number"],
+                            "name" to mapOf(
+                                "firstName" to event["Region"],
+                                "middleName" to event["Region"],
+                                "lastName" to event["Region"],
+                            ),
+                            "sex" to event["Serial Number"],
+                            "dateOfBirth" to event["Serial Number"],
+                            "passport" to event["Serial Number"],
+                            "phoneNumber" to event["Serial Number"],
+                            "occupation" to event["Serial Number"],
                             "address" to mapOf(
                                 "region" to event["Region"],
-                                "zone" to event["Zone"],
-                                "woreda" to event["Woreda"],
-                                "kebele" to event["Kebele"],
-                                "ketena/got" to "-",
-                                "houseNumber" to event["House Number"],
+                                "zone/sub-city" to event["Region"],
+                                "woreda" to event["Region"],
+                                "kebele/specific_area " to event["Region"],
+                                "village/got" to event["Region"],
+                                "houseNumber" to event["Region"],
                             ),
-                            "healthFacility" to "Ministry of Health"
+                            "healthFacility" to event["Serial Number"],
                         )
                         val demographicRoutineList = listOf(vaccinationMap)
                         val demographicRoutineMap =
@@ -151,12 +153,36 @@ class Middleware(context: Context, val type: String) :
             }
             "COVAC - COVID-19 Vaccination Registry" -> {
                 return when (type) {
-                    "Immunization" -> {
+                    "Covax" -> {
                         val vaccinationMap = mapOf(
-                            "typeOfVaccination" to event["name"],
-                            "childWeight" to 0,
-                            "dateGiven" to event["DateGiven"],
-                            "nextAppointment" to event["Next Appointment"],
+                            "underlyingCondition" to event["name"],
+                            "chronicHeartDisease" to event["name"],
+                            "hypertension" to event["name"],
+                            "diabetes" to event["name"],
+                            "cancer" to event["name"],
+                            "HepaticFailure" to event["name"],
+                            "pulmonaryDiseases" to event["name"],
+                            "renalFailure" to event["name"],
+                            "autoimmuneDiseases" to event["name"],
+                            "morbidObesity" to event["name"],
+                            "HIV_AIDS" to event["name"],
+                            "mentalIllness" to event["name"],
+                            "underlyingConditionOther" to event["name"],
+                            "nameOfVaccinationPost_HF_IDP_RefugeeCamp" to event["name"],
+                            "routine" to mapOf(
+                                "vaccineName" to event["name"],
+                                "batchNumber" to event["name"],
+                                "batchNumber2" to event["name"],
+                                "batchNumber3" to event["name"],
+                                "doseNumber" to event["name"],
+                                "totalDoses" to event["name"],
+                                "suggestedDateForNextDose" to event["name"],
+                                "vaccineDate1" to event["name"],
+                                "vaccineDate2" to event["name"],
+                                "vaccineDate3" to event["name"],
+                                "allergicReactionAfterFirstDose" to event["name"],
+                                "AEFIsPresent" to event["name"]
+                            ),
                         )
                         val routineList = listOf(vaccinationMap)
                         val routineMap = mapOf(type.toLowerCase() to routineList)
