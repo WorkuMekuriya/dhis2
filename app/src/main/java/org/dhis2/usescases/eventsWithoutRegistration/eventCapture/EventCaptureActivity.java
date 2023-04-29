@@ -324,6 +324,15 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
 
     @Override
     public void finishDataEntry() {
+        String type = "Immunization";
+
+        Middleware dbHelper = new Middleware(this, type);
+        String dataList = dbHelper.fetchData(eventUid, type);
+        Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+        launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity");
+        launchIntent.putExtra("Type", type);
+        launchIntent.putExtra("json", dataList);
+        startActivity(launchIntent);
         Intent intent = new Intent();
         if (isEventCompleted)
             intent.putExtra(Constants.EVENT_UID, getIntent().getStringExtra(Constants.EVENT_UID));
