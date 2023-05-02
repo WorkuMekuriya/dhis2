@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
@@ -16,9 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.dhis2.App
 import org.dhis2.R
 import org.dhis2.commons.Constants
-import org.dhis2.commons.Constants.ENROLLMENT_UID
-import org.dhis2.commons.Constants.PROGRAM_UID
-import org.dhis2.commons.Constants.TEI_UID
+import org.dhis2.commons.Constants.*
 import org.dhis2.commons.dialogs.bottomsheet.BottomSheetDialog
 import org.dhis2.commons.dialogs.bottomsheet.BottomSheetDialogUiModel
 import org.dhis2.commons.dialogs.bottomsheet.DialogButtonStyle
@@ -30,6 +27,7 @@ import org.dhis2.form.model.EnrollmentRecords
 import org.dhis2.form.ui.FormView
 import org.dhis2.form.ui.provider.EnrollmentResultDialogUiProvider
 import org.dhis2.helper.Middleware
+import org.dhis2.helper.Middleware.MyData
 import org.dhis2.maps.views.MapSelectorActivity
 import org.dhis2.usescases.events.ScheduledEventActivity
 import org.dhis2.usescases.eventsWithoutRegistration.eventCapture.EventCaptureActivity
@@ -391,14 +389,15 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
         val type = "Demographic"
 
         val dbHelper = Middleware(this, type)
-        val dataList = dbHelper.fetchData(enrollmentUid, type)
+        val myData = dbHelper.fetchData(enrollmentUid, type) as MyData?
+
+//        formView.onSaveClick()
 
         val launchIntent = Intent(Intent.ACTION_MAIN)
         launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
-        launchIntent.putExtra("Type", type)
-        launchIntent.putExtra("json", dataList)
+        launchIntent.putExtra("Type", myData!!.type)
+        launchIntent.putExtra("json", myData.dataList)
         startActivity(launchIntent)
-        formView.onSaveClick()
     }
 
     override fun showProgress() {

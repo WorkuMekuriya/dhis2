@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.google.gson.GsonBuilder
 import timber.log.Timber
 import java.util.*
@@ -14,9 +15,10 @@ class Middleware(context: Context, val type: String) :
 
     companion object {
         private const val DATABASE_NAME =
-            "dhis-immunization-k8s-sandboxaddis-com_Test_unencrypted.db"
+            "196-191-212-226-8090_test1_unencrypted.db"
         private const val DATABASE_VERSION = 135
     }
+    data class MyData(val type: String, val dataList: String?)
 
     override fun onCreate(db: SQLiteDatabase?) {
 
@@ -25,9 +27,10 @@ class Middleware(context: Context, val type: String) :
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
     @SuppressLint("Range")
-    fun fetchData(eventUID: String, type: String): String? {
+    fun fetchData(eventUID: String, type: String): Any? {
         val dataList = mutableListOf<Data>()
         val db = readableDatabase
+        var Type : String? = null
         return when (type) {
             "Immunization" -> {
                 var cursor = db.rawQuery(
@@ -38,22 +41,40 @@ class Middleware(context: Context, val type: String) :
                     "SELECT Program.name as name FROM Program JOIN Event ON Event.program = Program.uid WHERE Event.uid = '$eventUID'",
                     null
                 )
-                val programName = program.getString(0)
+                Type = "Routine"
+                val programName: String = if (program.moveToFirst()) {
+                    program.getString(program.getColumnIndex("name"))
+                } else {
+                    ""
+                }
+                program.close()
+
+                Log.d("SHARED", "programName: $programName")
 
                 if (programName == "COVAC - COVID-19 Vaccination Registry") {
                     cursor = db.rawQuery(
                         "SELECT d.displayName as formName,d.shortName as name, tedv.value as value FROM DataElement d JOIN TrackedEntityDataValue tedv ON tedv.dataelement = d.uid WHERE tedv.event = '$eventUID' AND d.uid IN (SELECT dataElement FROM ProgramStageDataElement WHERE programStage IN (SELECT programStage FROM Event WHERE uid = '$eventUID'));",
                         null
                     )
+                    Type = "Covax"
+
                 }
+
+                var Vaccination_name: String? = null // declare the variable outside the loop
+
                 try {
                     if (cursor.moveToFirst()) {
                         do {
-                            val name = cursor.getString(cursor.getColumnIndex("name"))
+                            val vaccination = cursor.getString(cursor.getColumnIndex("name"))
                             val formName = cursor.getString(cursor.getColumnIndex("formName"))
                             val value = cursor.getString(cursor.getColumnIndex("value"))
-                            val data = Data(name, formName, value)
+                            Vaccination_name = vaccination.replace(formName, "").trim() // assign the value to the variable
+                            Log.d("Vaccination", Vaccination_name)
+                            val data = Data(Vaccination_name, formName, value)
                             dataList.add(data)
+
+                            // Subtract the formName from the name to create the vaccination string
+
                         } while (cursor.moveToNext())
                     }
                 } catch (e: SQLiteException) {
@@ -62,8 +83,10 @@ class Middleware(context: Context, val type: String) :
                 } finally {
                     cursor.close()
                 }
+
                 val arrayJson = convertArrayToArrayJSON(dataList, type)
-                return mapEventToJsonString(arrayJson, type, programName)
+                val jsonString = mapEventToJsonString(arrayJson, type, programName, Vaccination_name)
+                return MyData(Type, jsonString)
             }
 
             "Demographic" -> {
@@ -75,7 +98,17 @@ class Middleware(context: Context, val type: String) :
                     "SELECT Program.name as name FROM Program JOIN Enrollment ON Enrollment.program = Program.uid WHERE Enrollment.uid = '$eventUID'",
                     null
                 )
-                val programName = program.getString(0)
+                Type = "RoutineDemographic"
+
+                val programName: String = if (program.moveToFirst()) {
+                    program.getString(program.getColumnIndex("name"))
+                } else {
+                    ""
+                }
+                program.close()
+                if (programName == "COVAC - COVID-19 Vaccination Registry") {
+                    Type = "CovaxDemographic"
+                }
                 try {
                     if (cursor.moveToFirst()) {
                         do {
@@ -93,7 +126,8 @@ class Middleware(context: Context, val type: String) :
                     cursor.close()
                 }
                 val arrayJson = convertArrayToArrayJSON(dataList, type)
-                return mapEventToJsonString(arrayJson, type, programName)
+                val jsonString = mapEventToJsonString(arrayJson, type, programName)
+                return MyData(Type, jsonString)
             }
 
             else -> ""
@@ -101,7 +135,7 @@ class Middleware(context: Context, val type: String) :
     }
 
     private fun mapEventToJsonString(
-        event: Map<String, Any>, type: String, programName: String
+        event: Map<String, Any>, type: String, programName: String, Vaccination_name: String? = null
     ): String? {
         return when (programName) {
 
@@ -109,16 +143,18 @@ class Middleware(context: Context, val type: String) :
                 return when (type) {
                     "Immunization" -> {
                         val vaccinationMap = mapOf(
-                            "typeOfVaccination" to event["name"],
-                            "childWeight" to 0,
-                            "dateGiven" to event["DateGiven"],
-                            "nextAppointment" to event["Next Appointment"],
+                            "typeOfVaccination" to Vaccination_name,
+                            "childWeight" to 0, // replace with the actual value
+                            "dateGiven" to event["Date Given"],
+                            "nextAppointment" to (event["Next Appointment"] ?: "-")
                         )
-                        val routineList = listOf(vaccinationMap)
-                        val routineMap = mapOf(type.toLowerCase() to routineList)
+                        val routineList = mutableListOf<Map<String, Any>>()
+                        routineList.add(vaccinationMap as Map<String, Any>)
+                        val routineMap = mapOf("routine1" to routineList)
                         GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
                     }
                     "Demographic" -> {
+                        val type1 = "DemographicRoutine"
                         val vaccinationMap = mapOf(
                             "idNumber" to event["Serial Number"],
                             "name" to mapOf(
@@ -143,7 +179,7 @@ class Middleware(context: Context, val type: String) :
                         )
                         val demographicRoutineList = listOf(vaccinationMap)
                         val demographicRoutineMap =
-                            mapOf(type.toLowerCase() to demographicRoutineList)
+                            mapOf(type1 to demographicRoutineList)
                         GsonBuilder().setPrettyPrinting().create().toJson(demographicRoutineMap)
                     }
                     else -> ""
@@ -152,9 +188,10 @@ class Middleware(context: Context, val type: String) :
             }
             "COVAC - COVID-19 Vaccination Registry" -> {
                 return when (type) {
-                    "Covax" -> {
+                    "Immunization" -> {
                         val vaccinationMap = mapOf(
-                            "underlyingCondition" to false,
+                            "Covax" to mapOf(
+                            "underlyingCondition_comorbidity" to false,
                             "chronicHeartDisease" to false,
                             "hypertension" to false,
                             "diabetes" to false,
@@ -170,11 +207,11 @@ class Middleware(context: Context, val type: String) :
                             "nameOfVaccinationPost_HF_IDP_RefugeeCamp" to "-",
                             "routine" to mapOf(
                                 "vaccineName" to "-",
-                                "batchNumber" to event["COVAC- Batch Number"],
+                                "batchNumber1" to event["COVAC- Batch Number"],
                                 "batchNumber2" to "-",
                                 "batchNumber3" to "-",
-                                "doseNumber" to event["COVAC - Dose Number"],
-                                "totalDoses" to event["COVAC - Total doses"],
+                                "doseNumber" to 1,
+                                "totalDoses" to (event["COVAC - Total doses"].toString().toInt() ?: 0),
                                 "suggestedDateForNextDose" to event["COVAC Suggested date for next dose"],
                                 "vaccineDate1" to "-",
                                 "vaccineDate2" to "-",
@@ -183,36 +220,43 @@ class Middleware(context: Context, val type: String) :
                                 "AEFIsPresent" to false
                             ),
                         )
+                        )
                         val routineList = listOf(vaccinationMap)
-                        val routineMap = mapOf(type.toLowerCase() to routineList)
-                        GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
+                        val firstList = routineList[0]
+                        GsonBuilder().setPrettyPrinting().create().toJson(firstList)
                     }
                     "Demographic" -> {
+
                         val vaccinationMap = mapOf(
-                            "serialNumber" to event["Serial Number"],
-                            "cardNo" to event["Unique System Identifier (EPI)"],
-                            "nameOfInfant" to event["First Name"],
-                            "nameOfMother" to event["Mother's Name"],
-                            "nameOfBabysFather" to event["Middle name"],
-                            "sex" to event["Sex"],
-                            "dateOfBirth" to event["Date of Birth"],
-                            "dateOfBirthOfMother" to "-",
-                            "birthWeight/birthHeight" to event["Next Appointment"],
-                            "parentPhoneNo" to event["Caregiver's contact number"],
-                            "address" to mapOf(
-                                "region" to event["Region"],
-                                "zone" to event["Zone"],
-                                "woreda" to event["Woreda"],
-                                "kebele" to event["Kebele"],
-                                "ketena/got" to "-",
-                                "houseNumber" to event["House Number"],
-                            ),
-                            "healthFacility" to "Ministry of Health"
+                            "Demographic" to mapOf(
+                        "idNumber" to event["ID Number"].toString().toInt(),
+                                "cardNo" to event["Unique System Identifier (EPI)"],
+                                "name" to mapOf(
+                                    "firstName" to event["First name"],
+                                    "middleName" to event["Father's name/Middle name"],
+                                    "lastName" to event["Grandfather's name/Last name"]
+                                ),
+                                "sex" to event["Sex"],
+                                "dateOfBirth" to event["Date of birth (age)"],
+                                "passport" to event["Passport"],
+                                "phoneNumber" to event["Mobile phone number"],
+                                "occupation" to (event["Occupation"] ?: "-"),
+                                "address" to mapOf(
+                                    "region" to (event["Region"] ?: "-"),
+                                    "zone/sub-city" to (event["Zone"] ?: "-"),
+                                    "woreda" to (event["Woreda"] ?: "-"),
+                                    "kebele/specific_area" to (event["Village/Got"] ?: "-"),
+                                    "village/got" to (event["Village/Got"] ?: "-"),
+                                    "houseNumber" to event["House Number"].toString().toInt()
+                                ),
+                                "healthFacility" to "Ministry of Health"
+                            )
                         )
+
+
                         val demographicRoutineList = listOf(vaccinationMap)
-                        val demographicRoutineMap =
-                            mapOf(type.toLowerCase() to demographicRoutineList)
-                        GsonBuilder().setPrettyPrinting().create().toJson(demographicRoutineMap)
+                        val firstItem =demographicRoutineList[0]
+                        GsonBuilder().setPrettyPrinting().create().toJson(firstItem)
                     }
                     else -> ""
                 }
@@ -227,8 +271,8 @@ class Middleware(context: Context, val type: String) :
         data: MutableList<Data>, type: String
     ): Map<String, Any> {
         return when (type) {
-            "Routine" -> data.associate { it.formName to it.value }
-            "DemographicRoutine" -> data.associate { it.formName to it.value }
+            "Immunization" -> data.associate { it.formName to it.value }
+            "Demographic" -> data.associate { it.formName to it.value }
             else -> emptyMap()
         }
     }

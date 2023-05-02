@@ -246,14 +246,17 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
         String type = "Immunization";
 
         Middleware dbHelper = new Middleware(this, type);
-        String dataList = dbHelper.fetchData(eventUid, type);
+        Middleware.MyData myData = (Middleware.MyData) dbHelper.fetchData(eventUid, type);
+
+//        String dataList = dbHelper.fetchData(eventUid, type);
+
 
         setAction(ActionType.FINISH);
 
         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity");
-        launchIntent.putExtra("Type", type);
-        launchIntent.putExtra("json", dataList);
+        launchIntent.putExtra("Type", myData.getType());
+        launchIntent.putExtra("json", myData.getDataList());
         startActivity(launchIntent);
     }
 
@@ -327,11 +330,13 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
         String type = "Immunization";
 
         Middleware dbHelper = new Middleware(this, type);
-        String dataList = dbHelper.fetchData(eventUid, type);
+        Middleware.MyData myData = (Middleware.MyData) dbHelper.fetchData(eventUid, type);
+
+//        String dataList = dbHelper.fetchData(eventUid, type);
         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity");
-        launchIntent.putExtra("Type", type);
-        launchIntent.putExtra("json", dataList);
+        launchIntent.putExtra("Type", myData.getType());
+        launchIntent.putExtra("json", myData.getDataList());
         startActivity(launchIntent);
         Intent intent = new Intent();
         if (isEventCompleted)
