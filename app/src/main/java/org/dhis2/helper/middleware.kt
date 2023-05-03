@@ -156,31 +156,31 @@ class Middleware(context: Context, val type: String) :
                     "Demographic" -> {
                         val type1 = "DemographicRoutine"
                         val vaccinationMap = mapOf(
-                            "idNumber" to event["Serial Number"],
-                            "name" to mapOf(
-                                "firstName" to event["Region"],
-                                "middleName" to event["Region"],
-                                "lastName" to event["Region"],
-                            ),
-                            "sex" to event["Serial Number"],
-                            "dateOfBirth" to event["Serial Number"],
-                            "passport" to event["Serial Number"],
-                            "phoneNumber" to event["Serial Number"],
-                            "occupation" to event["Serial Number"],
+                            "DemographicRoutine" to mapOf(
+                            "serialNumber" to event["Serial Number"],
+                            "cardNo" to event["National ID"],
+                                "nameOfInfant" to event["First name"],
+                                "nameOfMother" to event["Mother's Name"],
+                                "nameOfBabysFather" to event["Father's name/Middle name"],
+                            "sex" to event["Sex"],
+                            "dateOfBirth" to event["Date of birth (age)"],
+                                "dateOfBirthOfMother" to "-",
+                                "birthWeight/birthHeight" to 0,
+                                "parentPhoneNo" to event["Mother/Caregiver's contact number"],
                             "address" to mapOf(
                                 "region" to event["Region"],
-                                "zone/sub-city" to event["Region"],
-                                "woreda" to event["Region"],
-                                "kebele/specific_area " to event["Region"],
-                                "village/got" to event["Region"],
-                                "houseNumber" to event["Region"],
+                                "zone" to event["Zone/Sub-city"],
+                                "woreda" to event["Woreda"],
+                                "kebele" to event["Woreda"],
+                                "ketena/got" to event["Village/Got"],
+                                "houseNumber" to event["House Number"],
                             ),
                             "healthFacility" to event["Serial Number"],
                         )
+                        )
                         val demographicRoutineList = listOf(vaccinationMap)
-                        val demographicRoutineMap =
-                            mapOf(type1 to demographicRoutineList)
-                        GsonBuilder().setPrettyPrinting().create().toJson(demographicRoutineMap)
+                        val firstList = demographicRoutineList[0]
+                        GsonBuilder().setPrettyPrinting().create().toJson(firstList)
                     }
                     else -> ""
                 }
