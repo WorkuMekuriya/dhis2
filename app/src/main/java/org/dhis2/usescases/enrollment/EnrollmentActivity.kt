@@ -391,13 +391,18 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
         val dbHelper = Middleware(this, type)
         val myData = dbHelper.fetchData(enrollmentUid, type) as MyData?
 
-//        formView.onSaveClick()
+
 
         val launchIntent = Intent(Intent.ACTION_MAIN)
         launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
         launchIntent.putExtra("Type", myData!!.type)
         launchIntent.putExtra("json", myData.dataList)
+        launchIntent.putExtra("name", myData.name)
+        launchIntent.putExtra("cardNo", myData.cardNo)
+        launchIntent.putExtra("phoneNo", myData.phoneNo)
+        launchIntent.putExtra("password", myData.password)
         startActivity(launchIntent)
+        formView.onSaveClick()
     }
 
     override fun showProgress() {
