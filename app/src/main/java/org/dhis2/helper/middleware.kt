@@ -14,11 +14,19 @@ class Middleware(context: Context, val type: String) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
-        private const val DATABASE_NAME =
-            "196-191-212-226-8090_test1_unencrypted.db"
+        private const val DATABASE_NAME = "196-191-212-226-8090_test1_unencrypted.db"
         private const val DATABASE_VERSION = 135
     }
-    data class MyData(val type: String, val dataList: String?,val name: String? = null, val cardNo: String? = null, val phoneNo: String? = null, val password: String? = null )
+
+    data class MyData(
+        val type: String,
+        val dataList: String?,
+        val name: String? = null,
+        val cardNo: String? = null,
+        val phoneNo: String? = null,
+        val password: String? = null,
+        val majorType: String? = null
+    )
 
     override fun onCreate(db: SQLiteDatabase?) {
 
@@ -127,8 +135,6 @@ class Middleware(context: Context, val type: String) :
                 }
                 val arrayJson = convertArrayToArrayJSON(dataList, type)
                 return mapEventToJsonString(arrayJson, type, programName)
-
-
             }
 
             else -> ""
@@ -143,7 +149,7 @@ class Middleware(context: Context, val type: String) :
             "Electronic Immunization Registry" -> {
                 return when (type) {
                     "Immunization" -> {
-                        val type1= "Routine";
+                        val type1 = "Routine";
                         val vaccinationMap = mapOf(
                             "typeOfVaccination" to Vaccination_name,
                             "childWeight" to 0, // replace with the actual value
@@ -153,8 +159,10 @@ class Middleware(context: Context, val type: String) :
                         val routineList = mutableListOf<Map<String, Any>>()
                         routineList.add(vaccinationMap as Map<String, Any>)
                         val routineMap = mapOf("routine1" to routineList)
-                       val jsonString =  GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
-                        return MyData(type1, jsonString)
+                        val majorType = "Routine"
+                        val jsonString =
+                            GsonBuilder().setPrettyPrinting().create().toJson(routineMap)
+                        return MyData(type1, jsonString, majorType)
                     }
                     "Demographic" -> {
                         val type1 = "RoutineDemographic"
@@ -166,33 +174,41 @@ class Middleware(context: Context, val type: String) :
                         val password = event["PIN"]
                         val vaccinationMap = mapOf(
                             "DemographicRoutine" to mapOf(
-                            "serialNumber" to event["Serial Number"],
-                            "cardNo" to event["National ID"],
+                                "serialNumber" to event["Serial Number"],
+                                "cardNo" to event["National ID"],
                                 "nameOfInfant" to event["First name"],
                                 "nameOfMother" to event["Mother's Name"],
                                 "nameOfBabysFather" to event["Father's name/Middle name"],
-                            "sex" to event["Sex"],
-                            "dateOfBirth" to event["Date of birth (age)"],
+                                "sex" to event["Sex"],
+                                "dateOfBirth" to event["Date of birth (age)"],
                                 "dateOfBirthOfMother" to "-",
                                 "birthWeight/birthHeight" to 0,
                                 "parentPhoneNo" to event["Mother/Caregiver's contact number"],
-                            "address" to mapOf(
-                                "region" to event["Region"],
-                                "zone" to event["Zone/Sub-city"],
-                                "woreda" to event["Woreda"],
-                                "kebele" to event["Woreda"],
-                                "ketena/got" to event["Village/Got"],
-                                "houseNumber" to event["House Number"],
-                            ),
-                            "healthFacility" to event["Serial Number"],
-                        )
+                                "address" to mapOf(
+                                    "region" to event["Region"],
+                                    "zone" to event["Zone/Sub-city"],
+                                    "woreda" to event["Woreda"],
+                                    "kebele" to event["Woreda"],
+                                    "ketena/got" to event["Village/Got"],
+                                    "houseNumber" to event["House Number"],
+                                ),
+                                "healthFacility" to event["Serial Number"],
+                            )
                         )
                         val demographicRoutineList = listOf(vaccinationMap)
                         val firstList = demographicRoutineList[0]
-                       val jsonString = GsonBuilder().setPrettyPrinting().create().toJson(firstList)
+                        val jsonString =
+                            GsonBuilder().setPrettyPrinting().create().toJson(firstList)
 
-                        return MyData(type1, jsonString, name, cardNo as String?,
-                            phoneNo as String?, password as String?
+                        val majorType = "Routine"
+                        return MyData(
+                            type1,
+                            jsonString,
+                            name,
+                            cardNo as String?,
+                            phoneNo as String?,
+                            password as String?,
+                            majorType
                         )
 
 
@@ -235,12 +251,14 @@ class Middleware(context: Context, val type: String) :
                                 "allergicReactionAfterFirstDose" to false,
                                 "AEFIsPresent" to false
                             ),
-                        )
+                            )
                         )
                         val routineList = listOf(vaccinationMap)
                         val firstList = routineList[0]
-                        val jsonString= GsonBuilder().setPrettyPrinting().create().toJson(firstList)
-                        return MyData(type1, jsonString)
+                        val jsonString =
+                            GsonBuilder().setPrettyPrinting().create().toJson(firstList)
+                        val majorType = "COVAX"
+                        return MyData(type1, jsonString, majorType)
                     }
                     "Demographic" -> {
                         val firstName = event["First name"]
@@ -272,17 +290,24 @@ class Middleware(context: Context, val type: String) :
                                     "kebele/specific_area" to (event["Village/Got"] ?: "-"),
                                     "village/got" to (event["Village/Got"] ?: "-"),
                                     "houseNumber" to event["House Number"].toString().toInt()
-                                ),
-                                "healthFacility" to "Ministry of Health"
+                                ), "healthFacility" to "Ministry of Health"
                             )
                         )
 
 
                         val demographicRoutineList = listOf(vaccinationMap)
-                        val firstItem =demographicRoutineList[0]
-                        val jsonString = GsonBuilder().setPrettyPrinting().create().toJson(firstItem)
-                        return MyData(type1, jsonString, name, cardNo as String?,
-                            phoneNo as String?, password as String?
+                        val firstItem = demographicRoutineList[0]
+                        val jsonString =
+                            GsonBuilder().setPrettyPrinting().create().toJson(firstItem)
+                        val majorType = "COVAX"
+                        return MyData(
+                            type1,
+                            jsonString,
+                            name,
+                            cardNo as String?,
+                            phoneNo as String?,
+                            password as String?,
+                            majorType
                         )
                     }
                     else -> ""
