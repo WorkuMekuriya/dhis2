@@ -76,11 +76,10 @@ class Middleware(context: Context, val type: String) :
                             val vaccination = cursor.getString(cursor.getColumnIndex("name"))
                             val formName = cursor.getString(cursor.getColumnIndex("formName"))
                             val value = cursor.getString(cursor.getColumnIndex("value"))
-                            Vaccination_name = vaccination.replace(formName, "").trim() // assign the value to the variable
+                            Vaccination_name = vaccination.replace(formName.trim(), "").trim() // assign the value to the variable
                             Log.d("Vaccination", Vaccination_name)
                             val data = Data(Vaccination_name, formName, value)
                             dataList.add(data)
-
                             // Subtract the formName from the name to create the vaccination string
 
                         } while (cursor.moveToNext())
@@ -152,7 +151,7 @@ class Middleware(context: Context, val type: String) :
                         val type1 = "Routine";
                         val vaccinationMap = mapOf(
                             "typeOfVaccination" to Vaccination_name,
-                            "childWeight" to 0, // replace with the actual value
+                            "childsweight" to 0, // replace with the actual value
                             "dateGiven" to event["Date Given"],
                             "nextAppointment" to (event["Next Appointment"] ?: "-")
                         )
@@ -289,7 +288,7 @@ class Middleware(context: Context, val type: String) :
                                     "woreda" to (event["Woreda"] ?: "-"),
                                     "kebele/specific_area" to (event["Village/Got"] ?: "-"),
                                     "village/got" to (event["Village/Got"] ?: "-"),
-                                    "houseNumber" to event["House Number"].toString().toInt()
+                                    "houseNumber" to 0
                                 ), "healthFacility" to "Ministry of Health"
                             )
                         )
