@@ -243,7 +243,7 @@ class Middleware(context: Context, val type: String) :
                                 "batchNumber3" to "-",
                                 "doseNumber" to 1,
                                 "totalDoses" to (event["COVAC - Total doses"].toString().toInt() ?: 0),
-                                "suggestedDateForNextDose" to event["COVAC Suggested date for next dose"],
+                                "suggestedDateForNextDose" to (event["COVAC Suggested date for next dose"] ?: "-"),
                                 "vaccineDate1" to "-",
                                 "vaccineDate2" to "-",
                                 "vaccineDate3" to "-",
