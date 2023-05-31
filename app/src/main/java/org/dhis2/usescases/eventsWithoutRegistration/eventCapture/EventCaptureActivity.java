@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -329,15 +330,24 @@ public class EventCaptureActivity extends ActivityGlobalAbstract implements Even
     public void finishDataEntry() {
         String type = "Immunization";
 
+
         Middleware dbHelper = new Middleware(this, type);
         Middleware.MyData myData = (Middleware.MyData) dbHelper.fetchData(eventUid, type);
 
-//        String dataList = dbHelper.fetchData(eventUid, type);
         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
         launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity");
         launchIntent.putExtra("Type", myData.getType());
+        launchIntent.putExtra("Type2",myData.getType2());
         launchIntent.putExtra("json", myData.getDataList());
+        launchIntent.putExtra("json2", myData.getDataList2());
+        launchIntent.putExtra("majorType", myData.getMajorType());
+        launchIntent.putExtra("name", myData.getName());
+        launchIntent.putExtra("cardNo", myData.getCardNo());
+        launchIntent.putExtra("phoneNo", myData.getPhoneNo());
+        launchIntent.putExtra("password", myData.getPassword());
+        Log.d("majorType", myData.getMajorType());
         startActivity(launchIntent);
+
         Intent intent = new Intent();
         if (isEventCompleted)
             intent.putExtra(Constants.EVENT_UID, getIntent().getStringExtra(Constants.EVENT_UID));
