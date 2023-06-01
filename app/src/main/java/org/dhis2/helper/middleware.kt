@@ -199,33 +199,35 @@ class Middleware(context: Context, val type: String) :
                 val type1 = "Covax"
                 val vaccinationMap1 = mapOf(
                     "Covax" to mapOf(
-                        "underlyingCondition_comorbidity" to false,
-                        "chronicHeartDisease" to false,
-                        "hypertension" to false,
-                        "diabetes" to false,
-                        "cancer" to false,
-                        "HepaticFailure" to false,
-                        "pulmonaryDiseases" to false,
-                        "renalFailure" to false,
-                        "autoimmuneDiseases" to false,
-                        "morbidObesity" to false,
-                        "HIV_AIDS" to false,
-                        "mentalIllness" to false,
-                        "underlyingConditionOther" to false,
+                        "underlyingCondition_comorbidity" to to(event["COVAC - Underlying condition/comorbidity"] == "true"),
+                        "chronicHeartDisease" to (event["COVAC - Chronic Heart Disease"] == "true"),
+                        "hypertension" to (event["COVAC - Hepatic Failure"] == "true"),
+                        "diabetes" to (event["COVAC - Diabetes"] == "true"),
+                        "cancer" to (event["COVAC - Cancer"] == "true"),
+                        "HepaticFailure" to (event["COVAC - Hepatic Failure"] == "true"),
+                        "pulmonaryDiseases" to (event["COVAC - Pulmonary diseases"] == "true"),
+                        "renalFailure" to (event["COVAC - Renal Failure"] == "true"),
+                        "autoimmuneDiseases" to (event["COVAC - Autoimmune diseases"] == "true"),
+                        "morbidObesity" to (event["COVAC - Morbid obesity"] == "true"),
+                        "HIV_AIDS" to (event["COVAC - HIV/AIDS"] == "true"),
+                        "mentalIllness" to (event["COVAC - Mental Illness"] == "true"),
+                        "underlyingConditionOther" to (event["COVAC - Underlying condition Other"] == "true"),
                         "nameOfVaccinationPost_HF_IDP_RefugeeCamp" to "-",
                         "routine" to mapOf(
-                            "vaccineName" to "-",
+                            "vaccineName" to event["COVAC - Vaccine Name"],
                             "batchNumber1" to event["COVAC- Batch Number"],
                             "batchNumber2" to "-",
                             "batchNumber3" to "-",
                             "doseNumber" to 1,
-                            "totalDoses" to (event["COVAC - Total doses"].toString().toIntOrNull() ?: 0),
-                            "suggestedDateForNextDose" to (event["COVAC Suggested date for next dose"] ?: "-"),
+                            "totalDoses" to (event["COVAC - Total doses"].toString().toIntOrNull()
+                                ?: 0),
+                            "suggestedDateForNextDose" to (event["COVAC Suggested date for next dose"]
+                                ?: "-"),
                             "vaccineDate1" to "-",
                             "vaccineDate2" to "-",
                             "vaccineDate3" to "-",
                             "allergicReactionAfterFirstDose" to false,
-                            "AEFIsPresent" to false
+                            "AEFIsPresent" to to(event["COVAC - AEFIs present"] == "true")
                         ),
                     )
                 )

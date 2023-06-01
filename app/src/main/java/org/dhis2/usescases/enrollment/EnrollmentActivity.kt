@@ -385,23 +385,6 @@ class EnrollmentActivity : ActivityGlobalAbstract(), EnrollmentView {
     }
 
     override fun performSaveClick() {
-        val enrollmentUid = intent.getStringExtra(ENROLLMENT_UID_EXTRA) ?: ""
-//        val type = "Demographic"
-//
-//        val dbHelper = Middleware(this, type)
-//        val myData = dbHelper.fetchData(enrollmentUid, type) as MyData?
-//
-//        val launchIntent = Intent(Intent.ACTION_MAIN)
-//        launchIntent.setClassName("com.moh.middleware", "com.moh.middleware.MainActivity")
-//        launchIntent.putExtra("Type", myData!!.type)
-//        launchIntent.putExtra("json", myData.dataList)
-//        launchIntent.putExtra("majorType", myData!!.majorType)
-//        launchIntent.putExtra("name", myData.name)
-//        launchIntent.putExtra("cardNo", myData.cardNo)
-//        launchIntent.putExtra("phoneNo", myData.phoneNo)
-//        launchIntent.putExtra("password", myData.password)
-//        startActivity(launchIntent)
-
         formView.onSaveClick()
     }
 
