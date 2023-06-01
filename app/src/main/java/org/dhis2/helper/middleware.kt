@@ -199,7 +199,7 @@ class Middleware(context: Context, val type: String) :
                 val type1 = "Covax"
                 val vaccinationMap1 = mapOf(
                     "Covax" to mapOf(
-                        "underlyingCondition_comorbidity" to to(event["COVAC - Underlying condition/comorbidity"] == "true"),
+                        "underlyingCondition_comorbidity" to false,
                         "chronicHeartDisease" to (event["COVAC - Chronic Heart Disease"] == "true"),
                         "hypertension" to (event["COVAC - Hepatic Failure"] == "true"),
                         "diabetes" to (event["COVAC - Diabetes"] == "true"),
@@ -227,7 +227,7 @@ class Middleware(context: Context, val type: String) :
                             "vaccineDate2" to "-",
                             "vaccineDate3" to "-",
                             "allergicReactionAfterFirstDose" to false,
-                            "AEFIsPresent" to to(event["COVAC - AEFIs present"] == "true")
+                            "AEFIsPresent" to false
                         ),
                     )
                 )
