@@ -223,7 +223,7 @@ class Middleware(context: Context, val type: String) :
                                 ?: 0),
                             "suggestedDateForNextDose" to (event["COVAC Suggested date for next dose"]
                                 ?: "-"),
-                            "vaccineDate1" to "-",
+                            "vaccineDate1" to event["COVAC Suggested date for next dose"],
                             "vaccineDate2" to "-",
                             "vaccineDate3" to "-",
                             "allergicReactionAfterFirstDose" to false,
