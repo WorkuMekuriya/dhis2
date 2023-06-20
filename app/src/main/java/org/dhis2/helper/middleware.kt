@@ -246,7 +246,7 @@ class Middleware(context: Context, val type: String) :
                 val password = event2["PIN"]
                 val vaccinationMap2 = mapOf(
                     "Demographic" to mapOf(
-                        "idNumber" to event2["ID Number"].toString().toIntOrNull(),
+                        "idNumber" to event2["ID Number"],
                         "cardNo" to event2["Unique System Identifier (EPI)"],
                         "name" to mapOf(
                             "firstName" to event2["First name"],
@@ -264,7 +264,7 @@ class Middleware(context: Context, val type: String) :
                             "woreda" to (event2["Woreda"] ?: "-"),
                             "kebele/specific_area" to (event2["Village/Got"] ?: "-"),
                             "village/got" to (event2["Village/Got"] ?: "-"),
-                            "houseNumber" to 0
+                            "houseNumber" to event2["House Number"]
                         ),
                         "healthFacility" to "Ministry of Health"
                     )
